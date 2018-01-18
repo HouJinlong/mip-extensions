@@ -22,20 +22,15 @@ define(function (require) {
         
         adplace=adplace?adplace.split(','):['m_b1'];
         
-        if(ajaxXml){
-        	 loadXml();
-        }
+        loadXml();
+        
         function loadXml() {
 		    $.ajax({
 		        type: "GET",
 		        url: ajaxXml,
 		        dataType: "xml",
 		        success: function(responsexml) {
-		             if(ajaxIp){
-		             	loadIp(responsexml);
-		             }else{
-		             	checkAdmIPajax(responsexml)
-		             }
+		            loadIp(responsexml);
 		        }
 		    })
 		}
@@ -45,7 +40,6 @@ define(function (require) {
                 url: ajaxIp,
                 dataType: "script",
                 success: function() {
-                	var remote_ip_info = {"country":"中国","province":"北京","city":"","district":"","isp":"","type":"","desc":""};
                     if (typeof remote_ip_info !== 'undefined') {
                         admipajaxsuccess = true;
                         if (remote_ip_info.ret == 1) {
