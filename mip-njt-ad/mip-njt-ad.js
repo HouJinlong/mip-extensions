@@ -41,7 +41,7 @@ define(function (require) {
                 dataType: "script",
                 success: function() {
                     if (typeof remote_ip_info !== 'undefined') {
-                        admipajaxsuccess = true;
+                    	
                         if (remote_ip_info.ret == 1) {
                             for (x in adplace) {
                                 loadadm(responsexml, remote_ip_info.province, remote_ip_info.city, adplace[x])
