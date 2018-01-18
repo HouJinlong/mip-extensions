@@ -17,10 +17,11 @@ define(function (require) {
         ajaxIp = element.getAttribute('ajaxIp') || '/API/IP.ashx?action=js',
         pagename = element.getAttribute('pagename'),
         ptypeid = element.getAttribute('ptypeid'),
-        pcategoryid = element.getAttribute('pcategoryid');
+        pcategoryid = element.getAttribute('pcategoryid'),
         adplace = element.getAttribute('adplace');
+        
         adplace=adplace?adplace.split(','):['m_b1'];
-        //判断地址都存在
+        
         if(ajaxXml){
         	 loadXml();
         }
