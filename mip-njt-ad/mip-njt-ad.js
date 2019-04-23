@@ -11,11 +11,11 @@ define(function (require) {
      * 构造元素，只会运行一次
      */
     customElement.prototype.build = function () {
-
         // TODO
         var element = this.element;
+        var ajaxIps = !!element.getAttribute('ajaxIp')? element.getAttribute('ajaxIp'):'/API/IP.ashx?action=js'
         var ajaxXml = element.getAttribute('ajaxXml') || '/adm/15.xml';
-        var ajaxIp = element.getAttribute('ajaxIp') || '/API/IP.ashx?action=js';
+        var ajaxIp = ajaxIps;
         var pagename = element.getAttribute('pagename');
         var ptypeid = element.getAttribute('ptypeid');
         var pcategoryid = element.getAttribute('pcategoryid');
@@ -32,6 +32,26 @@ define(function (require) {
                 url: ajaxXml,
                 dataType: 'xml',
                 success: function (responsexml) {
+                    var isLbs = false;//是否开启地理位置定向策略
+                    for (let x in adplace) {
+                        $(responsexml).find('adplace').each(function () {
+                            if ($(this).find('placeName').text() === adplace[x]) {
+                                $(this).find('item').each(function () {
+                                    var flag1 = $(this).find('pagename').text().length == 0 || $(this).find('pagename').text().split(",").indexOf(pagename) >= 0;
+                                    var flag2 = $(this).find('typeid').text().length == 0 || $(this).find('typeid').text().split(",").indexOf(ptypeid.toString()) >= 0;
+                                    var flag3 = $(this).find('categoryid').text().length == 0 || $(this).find('categoryid').text().split(",").indexOf(pcategoryid.toString()) >= 0;
+                                    var flag4 = $(this).find('province').text().length > 0 || $(this).find('city').text().length > 0;
+                                    if (!!flag1&&!!flag2&&!!flag3&&!!flag4) {
+                                        isLbs = true;
+                                        return false;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    if(!!isLbs){
+                        loadIp(responsexml);
+                    }
                     loadIp(responsexml);
                 }
             });
@@ -42,10 +62,10 @@ define(function (require) {
                 url: ajaxIp,
                 dataType: 'script',
                 success: function () {
-                    if (remoteIpInfo) {
-                        if (remoteIpInfo.ret === 1) {
+                    if (remote_ip_info) {
+                        if (remote_ip_info.ret === 1) {
                             for (var i = 0; i < adplace.length; i++) {
-                                loadadm(responsexml, remoteIpInfo.province, remoteIpInfo.city, adplace[i]);
+                                loadadm(responsexml, remote_ip_info.province, remote_ip_info.city, adplace[i]);
                             }
                         }
                         else {
@@ -73,18 +93,18 @@ define(function (require) {
                 if ($(this).find('placeName').text() === placeName) {
                     $(this).find('item').each(function () {
                         if (($(this).find('pagename').text() === ''
-                        || $(this).find('pagename').text().indexOf(pagename) >= 0)
+                        || $(this).find('pagename').text().split(",").indexOf(pagename) >= 0)
                         && ($(this).find('typeid').text() === ''
-                        || $(this).find('typeid').text().indexOf(ptypeid) >= 0)
+                        || $(this).find('typeid').text().split(",").indexOf(ptypeid) >= 0)
                         && ($(this).find('categoryid').text() === ''
-                        || $(this).find('categoryid').text().indexOf(pcategoryid) >= 0)
+                        || $(this).find('categoryid').text().split(",").indexOf(pcategoryid) >= 0)
                         && ($(this).find('province').text() === ''
-                        || $(this).find('province').text().indexOf(province) >= 0
+                        || $(this).find('province').text().split(",").indexOf(province) >= 0
                         || province.indexOf($(this).find('province').text()) >= 0)
                         && ($(this).find('city').text() === ''
-                        || $(this).find('city').text().indexOf(city) >= 0
+                        || $(this).find('city').text().split(",").indexOf(city) >= 0
                         || city.indexOf($(this).find('city').text()) >= 0)) {
-                            $('' + placeName).html($(this).find('adcode').text())
+                            $('#' + placeName).html($(this).find('adcode').text())
                             .css('overflow', 'hidden')
                             .find('img').css({
                                 'display': 'block',
